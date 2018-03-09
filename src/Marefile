@@ -1,0 +1,21 @@
+cc   = "gcc"
+libs = "-ltermbox"
+cflags = ""
+
+targets = {
+	default = {
+		input   = "*.o"
+		output  = "test"
+		command = "$(cc) $(cflags) $(input) -o $(output) $(libs)"
+		
+		files = {
+			"*.c" = compile_c
+		}
+	}
+}
+
+compile_c = {
+	input   = "$(file)"
+	output  = "$(patsubst %.c,%.o,$(file))"
+	command = "$(cc) $(cflags) -c $(input) -o $(output)"
+}
