@@ -16,10 +16,10 @@ struct tui_Box
 	uint16_t width, height;	// INCLUDES the box's border.
 
 	uint16_t fg, bg;
-	const tui_BoxChars *box_chars;	// The characters used to draw the bo	x border. This pointer is _not_ freed upon destruction.
+	const tui_BoxChars *box_chars;	// The characters used to draw the box border. This pointer is _not_ freed upon destruction. This variable is ignored by some subclasses.
 	
 	/* Pointers */
-	tui_Box *next;
+	tui_Box *next, *prev;	// Boxes are stored in a dually-linked list.
 	tui_Box *child;
 	
 	void (*on_draw)(tui_Box *box, uint16_t x, uint16_t y);		// Gets called to draw the box. Points to tui_Box_draw() by default. If you are overriding this but still want the normal box to be drawn, call tui_Box_draw() yourself.
@@ -30,9 +30,10 @@ struct tui_Box
 
 /* Member functions */
 tui_Box *tui_Box_new();
+void     tui_Box_init(tui_Box *box);	// Initializes an existing tui_Box.
 void     tui_Box_free(tui_Box *box);
-void     tui_Box_draw     (tui_Box *box, uint16_t x, uint16_t y);	// This does *NOT* do any drawing. It can be called on _any_ subclass of tui_Box and calls the ->on_draw function (if present) and calls itsself on the box's children. x and y are the absolute coordinates of the top left of the box.
-void     tui_Box_draw_func(tui_Box *box, uint16_t x, uint16_t y);	// This function does the actual drawing of the box. tui_Box->on_draw is set to this by default. Subclasses of tui_Box do not need to call this.
+void     tui_Box_call_draw(tui_Box *box, uint16_t x, uint16_t y);	// This does *NOT* do any drawing. It can be called on _any_ subclass of tui_Box and calls the ->on_draw function (if present) and calls itsself on the box's children. x and y are the absolute coordinates of the top left of the box.
+void     tui_Box_draw     (tui_Box *box, uint16_t x, uint16_t y);	// This function does the actual drawing of the box. tui_Box->on_draw is set to this by default. Subclasses of tui_Box do not need to call this.
 
 #endif
 

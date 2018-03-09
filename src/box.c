@@ -9,6 +9,15 @@ tui_Box *tui_Box_new()
 {
 	tui_Box *box = malloc(sizeof(tui_Box));
 	
+	if (! box) return NULL;
+	
+	tui_Box_init(box);
+	
+	return box;
+}
+
+void tui_Box_init(tui_Box *box)
+{
 	box->x = 0;
 	box->y = 0;
 	
@@ -20,20 +29,23 @@ tui_Box *tui_Box_new()
 	box->box_chars = &TUI_BOX_CHARS_SINGLE;
 	
 	box->next = NULL;
+	box->prev = NULL;
 	box->child = NULL;
 	
-	box->on_draw  = tui_Box_draw_func;
+	box->on_draw  = tui_Box_draw;
 	box->on_event = NULL;
-	
-	return box;
 }
 
 void tui_Box_free(tui_Box *box)
 {
+	/* Free children */
+	/* Children are freed manually by the library user */
+	
+	/* Free struct */
 	free(box);
 }
 
-void tui_Box_draw(tui_Box *box, uint16_t x, uint16_t y)
+void tui_Box_call_draw(tui_Box *box, uint16_t x, uint16_t y)
 {
 	/* This is the recursive function that calls the	*
 	 * draw function if present and draws the children.	*
@@ -44,13 +56,21 @@ void tui_Box_draw(tui_Box *box, uint16_t x, uint16_t y)
 		box->on_draw(box, x, y);
 	
 	/* Draw children */
-	for (tui_Box *current = box->child; current != NULL; current = current->next)
+	if (box->child != NULL)
 	{
-		tui_Box_draw(current, x + current->x, y + current->y);
+		tui_Box *current = box->child;
+		
+		do
+		{
+			tui_Box_call_draw(current, x + current->x, y + current->y);
+			
+			current = current->next;	
+		}
+		while (current != box->child);
 	}
 }
 
-void tui_Box_draw_func(tui_Box *box, uint16_t x, uint16_t y)
+void tui_Box_draw(tui_Box *box, uint16_t x, uint16_t y)
 {
 	/* This function actually draws the box. */
 	

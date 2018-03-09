@@ -44,9 +44,9 @@ void tb_fill(uint16_t bg, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2)
 {
 	struct tb_cell *buffer = tb_cell_buffer();
 	
-	for (uint16_t y = y1; y < y2; y++)
+	for (uint16_t y = y1; y <= y2; y++)
 	{
-		for (uint16_t x = x1; x < x2; x++)
+		for (uint16_t x = x1; x <= x2; x++)
 		{
 			buffer[y * tb_width() + x].bg = bg;
 		}

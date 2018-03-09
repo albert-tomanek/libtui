@@ -27,7 +27,7 @@ typedef struct
 
 extern const tui_BoxChars TUI_BOX_CHARS_SINGLE;
 extern const tui_BoxChars TUI_BOX_CHARS_DOUBLE;
-extern const tui_BoxChars TUI_BOX_CHARS_EMPTY;
+extern const tui_BoxChars TUI_BOX_CHARS_NONE;
 
 /* CharMap */
 

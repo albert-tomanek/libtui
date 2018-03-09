@@ -12,7 +12,7 @@ const tui_BoxChars TUI_BOX_CHARS_DOUBLE = {
 	0x256c
 };
 
-const tui_BoxChars TUI_BOX_CHARS_EMPTY = {
+const tui_BoxChars TUI_BOX_CHARS_NONE = {
 	0x20, 0x20, 0x20, 0x20, 0x20, 0x20,		// Just spaces
 	0x20, 0x20, 0x20, 0x20,
 	0x20,
