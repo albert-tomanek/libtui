@@ -1,12 +1,12 @@
-cc   = "gcc"
+cc   = "clang"
 libs = "-ltermbox"
-cflags = ""
+cflags = "-g"
 
 targets = {
 	default = {
 		input   = "*.o"
 		output  = "test"
-		command = "$(cc) $(cflags) $(input) -o $(output) $(libs)"
+		command = "$(cc) $(cflags) -o $(output) $(input) $(libs)"
 		
 		files = {
 			"*.c" = compile_c

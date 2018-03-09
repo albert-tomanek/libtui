@@ -7,22 +7,29 @@
 #include "../include/box.h"
 #include "../include/misc.h"
 
-tui_Box *__tui_root;	// A pointer to the root widget/container. Global because there can only be one root widget.
-						// ^- TODO: Need to subclass Box to contain a pointer to floating windows
+struct
+{
+	/* The root widget/container. We had to subclass tui_Box	*
+	 * because the root of the widget tree has some extra		*
+	 * variables (eg. list of floating windows, *on_resize		*
+	 * function pointer) that the other widgets don't need.		*/
+	
+	tui_Box box;	// Superclass needs to be first for TUI_BOX() cast to work.
+} __tui_root;
+
 bool __mainloop = false;	// true while the mainloop is running.
 
 tui_Box *tui_init()
 {
+	/* Initialize Termbox */
 	int rc  = tb_init();
 	if (rc != 0) return NULL;
 	
-	__tui_root = tui_Box_new();
-	if (__tui_root == NULL) return NULL;
+	/* Initialize the root container */
+	__tui_root.box.width  = tb_width();
+	__tui_root.box.height = tb_height();
 	
-	__tui_root->width  = tb_width();
-	__tui_root->height = tb_height();
-	
-	return __tui_root;
+	return (tui_Box *) &__tui_root;
 }
 
 void tui_mainloop()
@@ -36,7 +43,9 @@ void tui_mainloop()
 		tb_clear();
 		
 		/* Draw children */
-		tb_fill(TB_BLUE, 3, 3, 5, 6);
+		tui_Box_draw(&__tui_root.box, 0, 0);
+		
+		/* Draw floating boxes */
 		
 		/* Update the terminal */
 		tb_present();
@@ -48,8 +57,8 @@ void tui_mainloop()
 		
 		if (event.type == TB_EVENT_RESIZE)
 		{
-			TUI_BOX(__tui_root)->width  = event.w;
-			TUI_BOX(__tui_root)->height = event.h;
+			__tui_root.box.width  = event.w;
+			__tui_root.box.height = event.h;
 			
 			// TODO: on_resize
 		}
@@ -74,7 +83,16 @@ void tui_shutdown()
 int main()
 {
 	tui_Box *root = tui_init();
+	tui_Box *my_box = tui_Box_new();
+	my_box->x = 10;
+	my_box->y = 2;
+	my_box->width  = 12;
+	my_box->height = 8;
+	root->child = my_box;
+	
 	tui_mainloop();
+	
+	tui_Box_free(my_box);
 	tui_shutdown();
 	return 0;
 }

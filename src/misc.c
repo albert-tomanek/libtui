@@ -52,37 +52,3 @@ void tb_fill(uint16_t bg, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2)
 		}
 	}
 }
-/*
-void tb_draw_box(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t fg, uint16_t bg)
-{
-	uint16_t width  = x2 - x1;
-	uint16_t height = y2 - y1;
-
-	tb_change_cell(x1, y1, TB_BOX_NW, fg, bg);	 			 // NW
-	tb_change_cell(x2, y1, TB_BOX_NE, fg, bg);	 			 // NE
-	tb_change_cell(x2, y2, TB_BOX_SE, fg, bg);	 			 // SE
-	tb_change_cell(x1, y2, TB_BOX_SW, fg, bg);	 			 // SW
-
-	for (uint16_t i = 0; i < (width - 1); i++)			 // Horizontals
-	{
-		tb_change_cell(1 + x1 + i, y1, TB_BOX_N, fg, bg);	 // N
-		tb_change_cell(1 + x1 + i, y2, TB_BOX_S, fg, bg);	 // S
-	}
-
-	for (uint16_t i = 0; i < (height - 1); i++)			 // Verticals
-	{
-		tb_change_cell(x1, 1 + y1 + i, TB_BOX_E, fg, bg);	 // E
-		tb_change_cell(x2, 1 + y1 + i, TB_BOX_W, fg, bg);	 // W
-	}
-
-
-	for (uint16_t x = 0; x < (width - 1); x++)
-	{
-		for (uint16_t y = 0; y < (height - 1); y++)
-		{
-			tb_change_cell(1 + x1 + x, 1 + y1 + y, TB_CHAR_SPACE, fg, bg);	 // For now, we have to fill it with a space character, so the box's contents will have to be re-written.
-		}
-	}
-
-}
-*/
