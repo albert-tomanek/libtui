@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <termbox.h>
 
+#include "../include/tui.h"
 #include "../include/box.h"
 #include "../include/misc.h"
 
@@ -30,10 +31,12 @@ void tui_Box_init(tui_Box *box)
 	
 	box->next = NULL;
 	box->prev = NULL;
-	box->child = NULL;
+	box->child  = NULL;
+	box->parent = NULL;
 	
 	box->on_draw  = tui_Box_draw;
 	box->on_event = NULL;
+	box->on_event_data = NULL;
 }
 
 void tui_Box_free(tui_Box *box)
@@ -53,7 +56,7 @@ void tui_Box_call_draw(tui_Box *box, uint16_t x, uint16_t y)
 	
 	/* Draw the current box */
 	if (box->on_draw)
-		box->on_draw(box, x, y);
+		box->on_draw(box, x, y, x + box->width - 1, y + box->height - 1, box->fg, (*(tui_focused()) == box) ? TB_RED : box->bg);
 	
 	/* Draw children */
 	if (box->child != NULL)
@@ -70,30 +73,28 @@ void tui_Box_call_draw(tui_Box *box, uint16_t x, uint16_t y)
 	}
 }
 
-void tui_Box_draw(tui_Box *box, uint16_t x, uint16_t y)
+void tui_Box_draw(tui_Box *box, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t fg, uint16_t bg)
 {
 	/* This function actually draws the box. */
-	
-	uint16_t x1 = x, y1 = y, x2 = x + box->width - 1, y2 = y + box->height - 1;
-	
+		
 	/* Corners */
-	tb_change_cell(x1, y1, box->box_chars->es, box->fg, box->bg);	// Top left corner
-	tb_change_cell(x2, y1, box->box_chars->sw, box->fg, box->bg);	// Top right corner
-	tb_change_cell(x2, y2, box->box_chars->nw, box->fg, box->bg);	// Bottom right corner
-	tb_change_cell(x1, y2, box->box_chars->ne, box->fg, box->bg);	// Bottom left corner
+	tb_change_cell(x1, y1, box->box_chars->es, fg, bg);	// Top left corner
+	tb_change_cell(x2, y1, box->box_chars->sw, fg, bg);	// Top right corner
+	tb_change_cell(x2, y2, box->box_chars->nw, fg, bg);	// Bottom right corner
+	tb_change_cell(x1, y2, box->box_chars->ne, fg, bg);	// Bottom left corner
 	
 	/* Horizontals */
 	for (uint16_t x = x1 + 1; x < x2; x++)
 	{
-		tb_change_cell(x, y1, box->box_chars->ew, box->fg, box->bg);	// Top
-		tb_change_cell(x, y2, box->box_chars->ew, box->fg, box->bg);	// Bottom
+		tb_change_cell(x, y1, box->box_chars->ew, fg, bg);	// Top
+		tb_change_cell(x, y2, box->box_chars->ew, fg, bg);	// Bottom
 	}
 	
 	/* Verticals */
 	for (uint16_t y = y1 + 1; y < y2; y++)
 	{
-		tb_change_cell(x1, y, box->box_chars->ns, box->fg, box->bg);	// Left
-		tb_change_cell(x2, y, box->box_chars->ns, box->fg, box->bg);	// Right
+		tb_change_cell(x1, y, box->box_chars->ns, fg, bg);	// Left
+		tb_change_cell(x2, y, box->box_chars->ns, fg, bg);	// Right
 	}
 	
 	/* Clear */
@@ -101,7 +102,7 @@ void tui_Box_draw(tui_Box *box, uint16_t x, uint16_t y)
 	{
 		for (uint16_t x = x1 + 1; x < x2; x++)
 		{
-			tb_change_cell(x, y, ' ', box->fg, box->bg);
+			tb_change_cell(x, y, ' ', box->fg, bg);
 		}
 	}	
 }

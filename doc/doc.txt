@@ -1,0 +1,57 @@
+
+All objects drawn using the TUI library inherit tui_Box.
+Inheritance in C is done by nesting the superclass within the subclass
+as the first struct member. Take the following example where a tui_Button
+inherits tui_Box:
+
+	struct tui_Button
+	{
+		tui_Box box;	// We're inheriting from tui_Box.
+	
+		/* ... */
+	}
+
+The normal way to access the fields in `box` would be to do:
+
+	my_button->box.width
+
+However, since the tui_Box is the first field in tui_Button,
+it is easier to cast the pointer as a pointer to a tui_Box:
+
+	((tui_Box *) my_button)->width
+
+There is a macro to simplify this for you:
+
+	TUI_BOX(my_button)->width
+
+
+Callbacks
+=========
+
+Drawing widgets yourself
+========================
+Every tui_Box contains a pointer to the function that draws it.
+This makes it very easy to switch out the default drawing function for your own.
+
+	struct tui_Box
+	{
+		/* ... */
+	
+		void (*on_draw)(tui_Box *box, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t fg, uint16_t bg);
+	
+		/* ... */
+	}
+
+If you want keep the way a widget is being drawn and just draw on top of it,
+you just need to call the original draw function from your own one;
+
+void mySuperiorButtonDrawingFunction(tui_Box *box, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t fg, uint16_t bg)
+{
+	tui_Button_draw(box, x1, y1, x2, y2, fg, bg);
+	
+	// Your drawing code here
+}
+
+TUI_BOX(my_button)->on_draw = mySuperiorButtonDrawingFunction;
+
+
