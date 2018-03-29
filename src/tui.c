@@ -7,6 +7,8 @@
 #include "../include/box.h"
 #include "../include/misc.h"
 
+#include <stdio.h>
+
 struct
 {
 	/* The root widget/container. We had to subclass tui_Box	*
@@ -85,12 +87,6 @@ void tui_mainloop()
 		{
 			__tui_root.focused = __tui_root.focused->next;
 		}
-		else if (event.type == TB_EVENT_KEY && event.ch == 'q')
-		{
-			/* q quits the mainloop */
-			__mainloop = false;
-			break;
-		}
 		else
 		{
 			tui_Box *focused = __tui_root.focused;
@@ -115,6 +111,12 @@ void tui_shutdown()
 tui_Box **tui_focused()
 {
 	return &(__tui_root.focused);
+}
+
+void tui_on_resize(void (*on_resize)(uint16_t width, uint16_t height, void *data), void *data)
+{
+	__tui_root.on_resize = on_resize;
+	__tui_root.on_resize_data = data;
 }
 
 void tui_add(tui_Box *child, tui_Box *parent)
@@ -155,23 +157,41 @@ tui_Box *__tui_getlast(tui_Box *first)
 	return current;
 }
 
+/* Simple test program */
+
 #include "../include/button.h"
+#include "../include/label.h"
 
 void on_quit_button(tui_Button *but, void *data)
 {
 	tui_quit();
 }
 
+void on_resize(uint16_t width, uint16_t height, void *data)
+{
+	tui_Box *box = (tui_Box *) data;	// It's actually our label
+	
+	box->x = width - box->width;
+	box->y = height - box->height;
+}
+
 int main()
 {
 	tui_Box *root = tui_init();
-	
+		
 	/* Create GUI */
 	tui_Button *hello_button = tui_Button_new("Hello, world!");
 	TUI_BOX(hello_button)->x = 3;
 	TUI_BOX(hello_button)->y = 2;
 	tui_add(TUI_BOX(hello_button), root);
-
+	
+	tui_Label *dims_label = tui_Label_new("(0,0)");		// Dimensions
+	TUI_BOX(dims_label)->x = root->width - TUI_BOX(dims_label)->width;
+	TUI_BOX(dims_label)->y = root->height - 1;
+	tui_add(TUI_BOX(dims_label), root);
+	
+	tui_on_resize(on_resize, dims_label);
+	
 	tui_Button *quit_button = tui_Button_new("Quit");
 	TUI_BOX(quit_button)->x = 3;
 	TUI_BOX(quit_button)->y = root->height - TUI_BOX(quit_button)->height - 2;

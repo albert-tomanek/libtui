@@ -13,7 +13,7 @@ void      tui_mainloop();
 void      tui_quit();		// Stop the mainloop
 void      tui_shutdown();	// Clean up
 
-tui_Box **tui_focused();	// returns a pointer to the pointer which determines which widget is in focus.
+tui_Box **tui_focused();	// returns a pointer to the pointer that determines which widget is in focus.
 void      tui_on_resize(void (*on_resize)(uint16_t width, uint16_t height, void *data), void *data);	// Set the callback to be called when the window is resized
 
 /* Linked list functions */

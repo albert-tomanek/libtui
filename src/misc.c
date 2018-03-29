@@ -7,23 +7,6 @@
 
 #include "../include/misc.h"
 
-uint32_t *to_utf32(char *string)	// Supposedly works for ASCII only...
-{
-	size_t length = strlen(string);
-	uint32_t *out = calloc(length + 1, sizeof(uint32_t));
-	
-	uint32_t *b = out;
-	
-	for (char *a = string; *a != '\0'; a++, b++)
-	{
-		*b = *a;
-	}
-	
-	*b = 0;		// 32-bit null-terminator. `b` would have been incremented before the loop finished.
-
-	return out;
-}
-
 void tb_print(uint16_t x, uint16_t y, char *string, uint16_t fg, uint16_t bg)
 {
 	for (char *c = string; *c != '\0'; c++, x++)

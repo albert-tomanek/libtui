@@ -12,7 +12,7 @@ typedef struct tui_Button tui_Button;
 
 struct tui_Button
 {
-	tui_Box box;	// We're inheriting from tui_Box.
+	tui_Box box;	// We're inheriting tui_Box.
 	
 	char *text;
 	

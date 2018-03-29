@@ -20,7 +20,7 @@ tui_Button *tui_Button_new(const char *text)
 	TUI_BOX(button)->width  = strlen(text) + 2 + 2;	// +2 for borders; +2 for horizontal padding
 	TUI_BOX(button)->height = 3;
 
-	TUI_BOX(button)->bg = TB_WHITE;
+	TUI_BOX(button)->fg = TB_WHITE;
 	TUI_BOX(button)->bg = TB_CYAN;
 
 	TUI_BOX(button)->on_draw   = tui_Button_draw;		// Button has its own draw function.
@@ -28,6 +28,7 @@ tui_Button *tui_Button_new(const char *text)
 		
 	/* Initialize the button */
 	button->text = strdup(text);
+	if (! button->text) return NULL;
 	
 	button->on_click = NULL;
 	button->on_click_data = NULL;
