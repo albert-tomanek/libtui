@@ -1,6 +1,7 @@
-#include <stdint.h>
-#include <string.h>
 #include <stdlib.h>
+#include <stdint.h>
+#include <stdbool.h>
+#include <string.h>
 #include <termbox.h>
 
 #include "../include/box.h"
@@ -17,6 +18,8 @@ tui_Label *tui_Label_new(const char *text)
 
 	TUI_BOX(lab)->width  = strlen(text);
 	TUI_BOX(lab)->height = 1;
+	
+	TUI_BOX(lab)->selectable = false;		// No reason to select a label
 
 	TUI_BOX(lab)->on_draw   = tui_Label_draw;		// Button has its own draw function.
 		

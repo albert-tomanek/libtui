@@ -23,5 +23,4 @@ tui_Box *__tui_getlast(tui_Box *first);			// Get the last node of the linked lis
 #endif
 
 #ifdef __cplusplus
-}
 #endif

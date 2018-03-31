@@ -9,6 +9,8 @@
 
 #include <stdio.h>
 
+tui_Box *__tui_next_selectable(tui_Box *current);	// Gets the next widget that is selectable
+
 struct
 {
 	/* The root widget/container. We had to subclass tui_Box	*
@@ -26,6 +28,7 @@ struct
 } __tui_root;
 
 bool __mainloop = false;	// true while the mainloop is running.
+
 
 tui_Box *tui_init()
 {
@@ -85,7 +88,7 @@ void tui_mainloop()
 		}
 		else if (event.type == TB_EVENT_KEY && event.key == TB_KEY_TAB)
 		{
-			__tui_root.focused = __tui_root.focused->next;
+			__tui_root.focused = __tui_next_selectable(__tui_root.focused);
 		}
 		else
 		{
@@ -153,6 +156,16 @@ tui_Box *__tui_getlast(tui_Box *first)
 	{
 		current = current->next;
 	}
+	
+	return current;
+}
+
+tui_Box *__tui_next_selectable(tui_Box *current)
+{
+	do
+	{
+		current = current->next;
+	} while (current->selectable == false && current != NULL);
 	
 	return current;
 }

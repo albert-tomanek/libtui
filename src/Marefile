@@ -1,6 +1,6 @@
 cc   = "clang"
 libs = "-ltermbox"
-cflags = "-g"
+cflags = "-g -Wno-comment"
 
 targets = {
 	default = {

@@ -22,6 +22,8 @@ void tui_Box_init(tui_Box *box)
 	box->x = 0;
 	box->y = 0;
 	
+	box->selectable = true;
+	
 	box->width  = 0;
 	box->height = 0;
 	

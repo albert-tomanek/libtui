@@ -6,6 +6,7 @@ extern "C" {
 #define __TUI_BOX_H__
 
 #include <stdint.h>
+#include <stdbool.h>
 #include "chars.h"
 
 typedef struct tui_Box tui_Box;
@@ -14,13 +15,16 @@ struct tui_Box
 {
 	uint16_t x, y;			// The box's x and y WITHIN ITS CONTAINER
 	uint16_t width, height;	// INCLUDES the box's border.
+	
+	bool selectable;
 
 	uint16_t fg, bg;
 	const tui_BoxChars *box_chars;	// The characters used to draw the box border. This pointer is _not_ freed upon destruction. This variable is ignored by some subclasses.
 	
 	/* Pointers */
 	tui_Box *next, *prev;	// Boxes are stored in a dually-linked list.
-	tui_Box *parent, *child;
+	tui_Box *parent;sssss
+	tui_Box *child;			// Pointer to the box's first child box.
 	
 	void (*on_draw)(tui_Box *box,  uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t fg, uint16_t bg);		// Gets called to draw the box. Points to tui_Box_draw() by default. If you are overriding this but still want the normal box to be drawn, call tui_Box_draw() yourself.
 	void (*on_event)(tui_Box *box, struct tb_event *event, void *data);	// This gets called to handle termbox events
