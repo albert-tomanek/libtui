@@ -21,7 +21,7 @@ struct tui_Label
 
 tui_Label  *tui_Label_new(const char *text);
 void        tui_Label_free(tui_Label *but);
-void        tui_Label_draw(tui_Box *box, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t fg, uint16_t bg);
+void        tui_Label_draw(tui_Box *box, tui_State state, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2);
 
 #endif
 

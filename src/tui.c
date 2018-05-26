@@ -66,6 +66,8 @@ void tui_mainloop()
 		tb_clear();
 		
 		/* Draw children */
+		tb_set_cursor(-1, -1);	// Hide the cursor unless a widget wants it.
+		
 		tui_Box_call_draw(&__tui_root.box, 0, 0);
 		
 		/* Draw floating boxes */
@@ -172,12 +174,19 @@ tui_Box *__tui_next_selectable(tui_Box *current)
 
 /* Simple test program */
 
-#include "../include/button.h"
 #include "../include/label.h"
+#include "../include/button.h"
+#include "../include/entry.h"
 
 void on_quit_button(tui_Button *but, void *data)
 {
 	tui_quit();
+}
+
+bool on_entry_submit(tui_Entry *entry, void *data)
+{
+	bassign(((tui_Button *) data)->text, entry->text);
+	return true;
 }
 
 void on_resize(uint16_t width, uint16_t height, void *data)
@@ -198,12 +207,19 @@ int main()
 	TUI_BOX(hello_button)->y = 2;
 	tui_add(TUI_BOX(hello_button), root);
 	
-	tui_Label *dims_label = tui_Label_new("(0,0)");		// Dimensions
+	/*tui_Label *dims_label = tui_Label_new("(0,0)");		// Dimensions
 	TUI_BOX(dims_label)->x = root->width - TUI_BOX(dims_label)->width;
 	TUI_BOX(dims_label)->y = root->height - 1;
 	tui_add(TUI_BOX(dims_label), root);
 	
-	tui_on_resize(on_resize, dims_label);
+	tui_on_resize(on_resize, dims_label);*/
+	
+	tui_Entry *entry = tui_Entry_new(16);
+	TUI_BOX(entry)->x = 3;
+	TUI_BOX(entry)->y = 7;
+	entry->on_submit = on_entry_submit;
+	entry->on_submit_data = hello_button;
+	tui_add(TUI_BOX(entry), root);
 	
 	tui_Button *quit_button = tui_Button_new("Quit");
 	TUI_BOX(quit_button)->x = 3;
@@ -215,8 +231,10 @@ int main()
 	tui_mainloop();
 	
 	/* Clean up */
-	tui_Button_free(quit_button);
 	tui_Button_free(hello_button);
+	tui_Entry_free(entry);
+	//tui_Label_free(dims_label);
+	tui_Button_free(quit_button);
 	
 	tui_shutdown();
 	return 0;

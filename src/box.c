@@ -27,8 +27,10 @@ void tui_Box_init(tui_Box *box)
 	box->width  = 0;
 	box->height = 0;
 	
-	box->fg = TB_WHITE;
-	box->bg = TB_BLUE;
+	box->fg  = TB_WHITE;
+	box->bg  = TB_BLUE;
+	box->sbg = box->bg;
+	
 	box->box_chars = &TUI_BOX_CHARS_SINGLE;
 	
 	box->next = NULL;
@@ -58,7 +60,7 @@ void tui_Box_call_draw(tui_Box *box, uint16_t x, uint16_t y)
 	
 	/* Draw the current box */
 	if (box->on_draw)
-		box->on_draw(box, x, y, x + box->width - 1, y + box->height - 1, box->fg, (*(tui_focused()) == box) ? TB_RED : box->bg);
+		box->on_draw(box, (*(tui_focused()) == box) ? TUI_SELECTED : TUI_NORMAL, x, y, x + box->width - 1, y + box->height - 1);
 	
 	/* Draw children */
 	if (box->child != NULL)
@@ -75,9 +77,11 @@ void tui_Box_call_draw(tui_Box *box, uint16_t x, uint16_t y)
 	}
 }
 
-void tui_Box_draw(tui_Box *box, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t fg, uint16_t bg)
+void tui_Box_draw(tui_Box *box, tui_State state, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2)
 {
 	/* This function actually draws the box. */
+	uint16_t fg = box->fg;
+	uint16_t bg = (state != TUI_NORMAL) ? box->sbg : box->bg;
 		
 	/* Corners */
 	tb_change_cell(x1, y1, box->box_chars->es, fg, bg);	// Top left corner

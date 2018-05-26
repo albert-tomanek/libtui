@@ -1,7 +1,7 @@
 #include <stdint.h>
-#include <string.h>
 #include <stdlib.h>
 #include <termbox.h>
+#include <bstring/bstrlib.h>
 
 #include "../include/box.h"
 #include "../include/button.h"
@@ -14,22 +14,23 @@ tui_Button *tui_Button_new(const char *text)
 	tui_Button *button = malloc(sizeof(tui_Button));
 	if (! button) return NULL;
 	
+	button->text = bfromcstr(text);
+	if (! button->text) return NULL;
+	
 	/* Initialize the superclass */
 	tui_Box_init(&(button->box));
 
-	TUI_BOX(button)->width  = strlen(text) + 2 + 2;	// +2 for borders; +2 for horizontal padding
+	TUI_BOX(button)->width  = blength(button->text) + 2 + 2;	// +2 for borders; +2 for horizontal padding
 	TUI_BOX(button)->height = 3;
 
-	TUI_BOX(button)->fg = TB_WHITE;
-	TUI_BOX(button)->bg = TB_CYAN;
+	TUI_BOX(button)->fg  = TB_WHITE;
+	TUI_BOX(button)->bg  = TB_CYAN;
+	TUI_BOX(button)->sbg = TB_RED;
 
 	TUI_BOX(button)->on_draw   = tui_Button_draw;		// Button has its own draw function.
 	TUI_BOX(button)->on_event  = tui_Button_on_event;
 		
 	/* Initialize the button */
-	button->text = strdup(text);
-	if (! button->text) return NULL;
-	
 	button->on_click = NULL;
 	button->on_click_data = NULL;
 	
@@ -38,22 +39,25 @@ tui_Button *tui_Button_new(const char *text)
 
 void tui_Button_free(tui_Button *but)
 {
-	free(but->text);
+	bdestroy(but->text);
 	free(but);
 }
 
-void tui_Button_draw(tui_Box *box, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t fg, uint16_t bg)
+void tui_Button_draw(tui_Box *box, tui_State state, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2)
 {
 	tui_Button *but = (tui_Button *) box;
+	
+	uint16_t fg = (state == TUI_CLICKED) ? TUI_BOX(but)->fg | TB_BOLD : TUI_BOX(but)->fg;
+	uint16_t bg = (state != TUI_NORMAL) ? TUI_BOX(but)->sbg : TUI_BOX(but)->bg;
 		
 	/* Draw shadow */
 	tb_fill(TB_BLACK, x1 + 1, y1 + 1, x2 + 1, y2 + 1);		// Shadow is shifted down and right by one character.
 	
-	/* Draw but */
-	tui_Box_draw(TUI_BOX(but), x1, y1, x2, y2, fg, bg);
+	/* Draw box */
+	tui_Box_draw(TUI_BOX(but), state, x1, y1, x2, y2);
 	
 	/* Draw text */
-	tb_print(x1 + ((TUI_BOX(but)->width / 2) - (strlen(but->text) / 2)), y1 + (TUI_BOX(but)->height / 2), but->text, fg, bg);
+	tb_print(x1 + ((TUI_BOX(but)->width / 2) - (blength(but->text) / 2)), y1 + (TUI_BOX(but)->height / 2), bdata(but->text), fg, bg);
 }
 
 void tui_Button_on_event(tui_Box *box, struct tb_event *event, void *data)
@@ -86,7 +90,7 @@ void tui_Button_click(tui_Button *but)
 		
 		/* Draw the button */
 		if (TUI_BOX(but)->on_draw)
-			TUI_BOX(but)->on_draw((tui_Box *) but, x1, y1, x2, y2, TUI_BOX(but)->fg | TB_BOLD, TB_RED);
+			TUI_BOX(but)->on_draw((tui_Box *) but, TUI_CLICKED, x1, y1, x2, y2);
 		
 		tb_present();
 	}

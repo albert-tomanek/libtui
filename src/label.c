@@ -36,10 +36,10 @@ void tui_Label_free(tui_Label *lab)
 	free(lab);
 }
 
-void tui_Label_draw(tui_Box *box, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t fg, uint16_t bg)
+void tui_Label_draw(tui_Box *box, tui_State state, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2)
 {
 	tui_Label *lab = (tui_Label *) box;
-		
+	
 	/* Draw text */
-	tb_print((x2 - x1) / 2 - strlen(lab->text) / 2, (y2 - y1) / 2, lab->text, fg, bg);
+	tb_print((x2 - x1) / 2 - strlen(lab->text) / 2, (y2 - y1) / 2, lab->text, TUI_BOX(lab)->fg, TUI_BOX(lab)->bg);
 }
