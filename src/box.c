@@ -19,10 +19,12 @@ tui_Box *tui_Box_new()
 
 void tui_Box_init(tui_Box *box)
 {
+	box->destructor = tui_Box_free;
+	
 	box->x = 0;
 	box->y = 0;
 	
-	box->selectable = true;
+	box->selectable = false;
 	
 	box->width  = 0;
 	box->height = 0;
@@ -46,42 +48,35 @@ void tui_Box_init(tui_Box *box)
 void tui_Box_free(tui_Box *box)
 {
 	/* Free children */
-	/* Children are freed manually by the library user */
+	tui_Box_free_children(box);
 	
 	/* Free struct */
-	free(box);
+	free(box);					// This will work even if the function is called on a struct which inherits tui_Box, since free() magically knows how large the memory is.
 }
 
-void tui_Box_call_draw(tui_Box *box, uint16_t x, uint16_t y)
+void tui_Box_free_children(tui_Box *box)
 {
-	/* This is the recursive function that calls the	*
-	 * draw function if present and draws the children.	*
-	 * IT DOES NOT DO ANY ACTUAL DRAWING.				*/
-	
-	/* Draw the current box */
-	if (box->on_draw)
-		box->on_draw(box, (*(tui_focused()) == box) ? TUI_SELECTED : TUI_NORMAL, x, y, x + box->width - 1, y + box->height - 1);
-	
-	/* Draw children */
+	/* Go through list freeing children */
 	if (box->child != NULL)
 	{
-		tui_Box *current = box->child;
+		tui_Box *current = box->child, *next;
 		
-		do
+		current->prev->next = NULL;		// The last widget [in the circular list of children] won't point to the first widget anymore (it will point to null), so we can loop over the list without the fear of going round in circles. Especially since the first widget will be gone once we get to the last widget.
+		
+		while (current != NULL)
 		{
-			tui_Box_call_draw(current, x + current->x, y + current->y);
-			
-			current = current->next;	
+			next = current->next;
+			current->destructor(current);
+			current = next;
 		}
-		while (current != box->child);
 	}
 }
 
 void tui_Box_draw(tui_Box *box, tui_State state, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2)
 {
 	/* This function actually draws the box. */
-	uint16_t fg = box->fg;
-	uint16_t bg = (state != TUI_NORMAL) ? box->sbg : box->bg;
+	uint16_t fg = (state == TUI_CLICKED) ? box->fg | TB_BOLD : box->fg;
+	uint16_t bg = (state == TUI_NORMAL) ? box->bg : box->sbg;
 		
 	/* Corners */
 	tb_change_cell(x1, y1, box->box_chars->es, fg, bg);	// Top left corner

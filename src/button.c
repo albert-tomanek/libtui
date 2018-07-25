@@ -14,21 +14,25 @@ tui_Button *tui_Button_new(const char *text)
 	tui_Button *button = malloc(sizeof(tui_Button));
 	if (! button) return NULL;
 	
-	button->text = bfromcstr(text);
+	button->text = strdup(text);
 	if (! button->text) return NULL;
 	
 	/* Initialize the superclass */
 	tui_Box_init(&(button->box));
 
-	TUI_BOX(button)->width  = blength(button->text) + 2 + 2;	// +2 for borders; +2 for horizontal padding
+	TUI_BOX(button)->width  = strlen(button->text) + 2 + 2;	// +2 for borders; +2 for horizontal padding
 	TUI_BOX(button)->height = 3;
 
 	TUI_BOX(button)->fg  = TB_WHITE;
 	TUI_BOX(button)->bg  = TB_CYAN;
 	TUI_BOX(button)->sbg = TB_RED;
+	
+	TUI_BOX(button)->selectable = true;
 
 	TUI_BOX(button)->on_draw   = tui_Button_draw;		// Button has its own draw function.
 	TUI_BOX(button)->on_event  = tui_Button_on_event;
+	
+	TUI_BOX(button)->destructor = tui_Button_free;
 		
 	/* Initialize the button */
 	button->on_click = NULL;
@@ -39,8 +43,9 @@ tui_Button *tui_Button_new(const char *text)
 
 void tui_Button_free(tui_Button *but)
 {
-	bdestroy(but->text);
-	free(but);
+	free(but->text);
+	
+	tui_Box_free(TUI_BOX(but));
 }
 
 void tui_Button_draw(tui_Box *box, tui_State state, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2)
@@ -57,7 +62,7 @@ void tui_Button_draw(tui_Box *box, tui_State state, uint16_t x1, uint16_t y1, ui
 	tui_Box_draw(TUI_BOX(but), state, x1, y1, x2, y2);
 	
 	/* Draw text */
-	tb_print(x1 + ((TUI_BOX(but)->width / 2) - (blength(but->text) / 2)), y1 + (TUI_BOX(but)->height / 2), bdata(but->text), fg, bg);
+	tb_print(x1 + ((TUI_BOX(but)->width / 2) - (strlen(but->text) / 2)), y1 + (TUI_BOX(but)->height / 2), but->text, fg, bg);
 }
 
 void tui_Button_on_event(tui_Box *box, struct tb_event *event, void *data)
@@ -99,4 +104,10 @@ void tui_Button_click(tui_Button *but)
 	
 	if (but->on_click)
 		but->on_click(but, but->on_click_data);
+}
+
+void tui_Button_set_text(tui_Button *but, const char *text)
+{
+	free(but->text);
+	but->text = strdup(text);
 }

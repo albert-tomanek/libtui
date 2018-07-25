@@ -15,6 +15,8 @@ typedef struct tui_Box tui_Box;
 
 struct tui_Box
 {
+	void (*destructor)(tui_Box *box);
+	
 	uint16_t x, y;			// The box's x and y WITHIN ITS CONTAINER
 	uint16_t width, height;	// INCLUDES the box's border.
 	
@@ -39,7 +41,7 @@ struct tui_Box
 tui_Box *tui_Box_new();
 void     tui_Box_init(tui_Box *box);	// Initializes an existing tui_Box.
 void     tui_Box_free(tui_Box *box);
-void     tui_Box_call_draw(tui_Box *box, uint16_t x, uint16_t y);	// This does *NOT* do any drawing. It can be called on _any_ subclass of tui_Box and calls the ->on_draw function (if present) and calls itsself on the box's children. x and y are the absolute coordinates of the top left of the box.
+void     tui_Box_free_children(tui_Box *box);
 void     tui_Box_draw     (tui_Box *box, tui_State state, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2);	// This function does the actual drawing of the box. tui_Box->on_draw is set to this by default. Subclasses of tui_Box do not need to call this.
 
 #endif

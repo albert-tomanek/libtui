@@ -3,19 +3,10 @@ libs = "-ltermbox"
 cflags = "-g -Wno-comment"
 
 targets = {
-	default = {
-		input   = "*.o"
-		output  = "test"
-		command = "$(cc) $(cflags) -o $(output) $(input) $(libs)"
-		
-		files = {
-			"*.c" = compile_c
-		}
+	default = cApplication + {
+		input = "*.c"
+		output = "text"
+		libs = "termbox"
+		LDFLAGS = "-g"
 	}
-}
-
-compile_c = {
-	input   = "$(file)"
-	output  = "$(patsubst %.c,%.o,$(file))"
-	command = "$(cc) $(cflags) -c $(input) -o $(output)"
 }

@@ -1,0 +1,16 @@
+targets = {
+	default = cApplication + {
+		input  = "src/*.o"
+		output = "src/test"
+		
+		message = "$(command)"
+		cFlags += "-Wno-comment -I /usr/local/include"
+		
+		buildDir = "src/"
+		libs = {"termbox", "bstring"}
+		
+		files = {
+			"src/*.c" = cSource + {__ofile="$(basename $(subst ../,,$(file))).o"}
+		}
+	}
+}

@@ -21,7 +21,9 @@ tui_Label *tui_Label_new(const char *text)
 	
 	TUI_BOX(lab)->selectable = false;		// No reason to select a label
 
-	TUI_BOX(lab)->on_draw   = tui_Label_draw;		// Button has its own draw function.
+	TUI_BOX(lab)->on_draw   = tui_Label_draw;	// Label has its own draw function
+	
+	TUI_BOX(lab)->destructor   = tui_Label_free;
 		
 	/* Initialize the lab */
 	lab->text = strdup(text);
@@ -33,7 +35,8 @@ tui_Label *tui_Label_new(const char *text)
 void tui_Label_free(tui_Label *lab)
 {
 	free(lab->text);
-	free(lab);
+	
+	tui_Box_free(TUI_BOX(lab));
 }
 
 void tui_Label_draw(tui_Box *box, tui_State state, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2)
